@@ -5218,7 +5218,7 @@ pub fn getFdPath(fd: fd_t, out_buffer: *[MAX_PATH_BYTES]u8) RealPathError![]u8 {
         .macos, .ios, .watchos, .tvos => {
             // On macOS, we can use F.GETPATH fcntl command to query the OS for
             // the path to the file descriptor.
-            @memset(out_buffer, 0, MAX_PATH_BYTES);
+            @memset(out_buffer[0..MAX_PATH_BYTES], 0);
             switch (errno(system.fcntl(fd, F.GETPATH, out_buffer))) {
                 .SUCCESS => {},
                 .BADF => return error.FileNotFound,
@@ -5309,7 +5309,7 @@ pub fn getFdPath(fd: fd_t, out_buffer: *[MAX_PATH_BYTES]u8) RealPathError![]u8 {
             if (comptime builtin.os.version_range.semver.max.order(.{ .major = 6, .minor = 0 }) == .lt) {
                 @compileError("querying for canonical path of a handle is unsupported on this host");
             }
-            @memset(out_buffer, 0, MAX_PATH_BYTES);
+            @memset(out_buffer[0..MAX_PATH_BYTES], 0);
             switch (errno(system.fcntl(fd, F.GETPATH, out_buffer))) {
                 .SUCCESS => {},
                 .BADF => return error.FileNotFound,
@@ -5323,7 +5323,7 @@ pub fn getFdPath(fd: fd_t, out_buffer: *[MAX_PATH_BYTES]u8) RealPathError![]u8 {
             if (comptime builtin.os.version_range.semver.max.order(.{ .major = 10, .minor = 0 }) == .lt) {
                 @compileError("querying for canonical path of a handle is unsupported on this host");
             }
-            @memset(out_buffer, 0, MAX_PATH_BYTES);
+            @memset(out_buffer[0..MAX_PATH_BYTES], 0);
             switch (errno(system.fcntl(fd, F.GETPATH, out_buffer))) {
                 .SUCCESS => {},
                 .ACCES => return error.AccessDenied,
@@ -5707,7 +5707,7 @@ pub fn res_mkquery(
 
     // Construct query template - ID will be filled later
     var q: [280]u8 = undefined;
-    @memset(&q, 0, n);
+    @memset(q[0..n], 0);
     q[2] = @as(u8, op) * 8 + 1;
     q[5] = 1;
     mem.copy(u8, q[13..], name);
